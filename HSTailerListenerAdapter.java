@@ -18,6 +18,13 @@ public class HSTailerListenerAdapter extends TailerListenerAdapter {
 
    private final Pattern HERO_POWER_pattern = Pattern.compile("^\\[Power.*ACTION_START.*zone=PLAY.*SubType=PLAY.*Index=0.*");
    private final Pattern TURN_NUM_pattern = Pattern.compile("^\\[Power.*TAG_CHANGE.*Entity=\\[.*cardId=HERO.*tag=NUM_TURNS_IN_PLAY.*");
+   
+   private final Pattern ATTACKER_pattern = Pattern.compile("^\\[Power.*TAG_CHANGE.*name=.*tag=ATTACKING.*value=0.*");
+   private final Pattern DEFENDER_pattern = Pattern.compile("^\\[Power.*TAG_CHANGE.*name=.*tag=DEFENDING.*value=0.*");
+   
+   private final Pattern ENTERED_pattern = Pattern.compile("^\\[Zone.*\\[name=.*zone from  -> FRIENDLY PLAY.*");
+   private final Pattern SECRET_TRIGGER_pattern = Pattern.compile("^\\[Power.*ACTION_START.*zone=SECRET.*SubType=TRIGGER.*");
+   
 
    private boolean IS_ME = true;
 
@@ -67,9 +74,132 @@ public class HSTailerListenerAdapter extends TailerListenerAdapter {
          heroPower(line);
       } else if (TURN_NUM_pattern.matcher(line).matches()) {
          turnNumber(line);
+      } else if (ATTACKER_pattern.matcher(line).matches()) {
+         attacker(line);
+      } else if (DEFENDER_pattern.matcher(line).matches()) {
+         defender(line);
+      } else if (ENTERED_pattern.matcher(line).matches()) {
+         enteredPlay(line);
+      } else if (SECRET_TRIGGER_pattern.matcher(line).matches()) {
+         secretTriggered(line);
       }
 
    }
+
+
+
+
+   public void secretTriggered(String line) {
+      //[Power] GameState.DebugPrintPower() -     ACTION_START Entity=[name=Mirror Entity id=6 zone=SECRET zonePos=0 cardId=EX1_294 player=1] SubType=TRIGGER Index=0 Target=0
+      
+      String[] split = line.split(" ");
+      
+      int i = 2;
+      while (i < split.length && !split[i].contains("name=")) {
+         ++i;
+      }
+      String[] cardNameArr = split[i].split("=");
+      String cardName = cardNameArr[cardNameArr.length - 1];
+      ++i;
+      while (!split[i].startsWith("id")) {
+         cardName += " " + split[i++];
+      }
+      
+      
+      while (!split[i].startsWith("player"))
+         ++i;
+         
+      String playerName = "";
+      
+      String pNum = split[i].split("=")[1].split("\\]")[0];
+      if (pNum.equals("1")) {
+         playerName = p1;
+      } else {
+         playerName = p2;
+      }
+      
+      
+      
+      System.out.println("SECRET: " + playerName + "'s secret (" + cardName + ") has triggered");
+      
+      
+   }
+
+   public void enteredPlay(String line) {
+      //[Zone] ZoneChangeList.ProcessChanges() - id=40 local=False [name=One-eyed Cheat id=75 zone=PLAY zonePos=1 cardId=GVG_025 player=1] zone from  -> FRIENDLY PLAY
+      String[] split = line.split(" ");
+      
+      int i = 2;
+      while (i < split.length && !split[i].contains("name=")) {
+         ++i;
+      }
+      String cardName = split[i].split("=")[1];
+      ++i;
+      while (!split[i].startsWith("id")) {
+         cardName += " " + split[i++];
+      }
+      
+      
+      while (!split[i].startsWith("player"))
+         ++i;
+         
+      String playerName = "";
+      
+      String pNum = split[i].split("=")[1].split("\\]")[0];
+      if (pNum.equals("1")) {
+         playerName = p1;
+      } else {
+         playerName = p2;
+      }
+      
+      
+      System.out.println(cardName + " has entered " + playerName + "'s field");
+      
+   }
+   
+   
+   public void defender(String line) {
+      String[] split = line.split(" ");
+      
+      int i = 2;
+      while(i < split.length && !split[i].contains("name=")) {
+         ++i;
+      }
+      if (i == split.length)
+         return;
+      
+      String[] cardNameArr = split[i].split("=");
+      String cardName = cardNameArr[cardNameArr.length - 1];
+      ++i;
+      while (!split[i].startsWith("id")) {
+         cardName += " " + split[i++];
+      }
+      
+      System.out.println(cardName);
+   }
+
+   public void attacker(String line) {
+      String[] split = line.split(" ");
+      
+      int i = 2;
+      while(i < split.length && !split[i].contains("name=")) {
+         ++i;
+      }
+      if (i == split.length)
+         return;
+      
+      String[] cardNameArr = split[i].split("=");
+      String cardName = cardNameArr[cardNameArr.length - 1];
+      ++i;
+      while (!split[i].startsWith("id")) {
+         cardName += " " + split[i++];
+      }
+      
+      System.out.print(cardName + " is attacking ");
+      
+      
+   }
+
 
    public void turnNumber(String line) {
       String[] split = line.split(" ");
@@ -86,8 +216,11 @@ public class HSTailerListenerAdapter extends TailerListenerAdapter {
       while (!split[i].startsWith("id")) {
          pName += " " + split[i++];
       }
+      
+      while(!split[i].startsWith("player"))
+         ++i;
 
-      if (p1 == null && p2 == null) {
+      if (p1 == null || p2 == null) {
 
          String pNum = split[i].split("=")[1].split("\\]")[0];
          if (pNum.equals("1")) {
@@ -121,10 +254,27 @@ public class HSTailerListenerAdapter extends TailerListenerAdapter {
          return;
 
       if(split[i].split("=")[1].charAt(0) == '1') {
-         System.out.println("P1 used Hero Power");
+         System.out.print(p1 + " used Hero Power");
       } else {
-         System.out.println("P2 used Hero Power");
+         System.out.print(p2 + " used Hero Power");
       }
+      
+      while (i < split.length && !split[i].startsWith("Target"))
+         ++i;
+      
+      String[] targetNameArr = split[i].split("=");
+      String targetName = targetNameArr[targetNameArr.length - 1];
+      ++i;
+      if (!targetName.equals("0")) {
+         while (!split[i].startsWith("id")) {
+            targetName += " " + split[i++];
+         }
+         
+         System.out.print(" on " + targetName);
+      }
+      
+      
+      System.out.println();
    }
 
 
@@ -213,8 +363,8 @@ public class HSTailerListenerAdapter extends TailerListenerAdapter {
          return;
       }
 
-      p1 = "";
-      p2 = "";
+      p1 = null;
+      p2 = null;
 
       /*
       if (IS_ME)
@@ -225,6 +375,7 @@ public class HSTailerListenerAdapter extends TailerListenerAdapter {
       IS_ME = !IS_ME;
       */
 
+      /*
       System.out.print("PLAYER: " );
 
       String firstName = split[5].split("=")[1];
@@ -234,6 +385,7 @@ public class HSTailerListenerAdapter extends TailerListenerAdapter {
          System.out.print(split[i++] + " ");
       }
       System.out.println();
+      */
    }
 
    public void playCard(String line) {
@@ -241,11 +393,14 @@ public class HSTailerListenerAdapter extends TailerListenerAdapter {
       String[] split = line.split(" ");
 
 
+      /*
       String[] local = split[4].split("=");
       if (local[1].equals("True"))
          System.out.print("ME: ");
       else
          System.out.print("THEM: ");
+      */
+      System.out.print("PLAYED: ");
 
 
       System.out.print(split[5].split("=")[1] + " ");
