@@ -1,0 +1,28 @@
+To run this, you first need to enable logging in Hearthstone.
+
+OS X:
+
+   1. cd to ~/Library/Preferences/Blizzard/Hearthstone/
+   2. Create log.config
+   3. The file should have the following (except with no spaces in the file - left justified):
+      [Power]
+      LogLevel=1
+      FilePrinting=false
+      ConsolePrinting=true
+      ScreenPrinting=false
+
+      [Zone]
+      LogLevel=1
+      FilePrinting=false
+      ConsolePrinting=true
+      ScreenPrinting=false
+   4. Then restart (or start) Hearthstone
+
+Windows:
+
+   1. Unknown currently, will check back later
+
+
+
+
+Once logging is enabled, you can run jar.sh to combile the files, create a single jar, and run the jar to start logging.
