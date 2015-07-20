@@ -225,7 +225,7 @@ public class HSTailerListenerAdapter extends TailerListenerAdapter {
       IS_ME = !IS_ME;
       */
 
-      System.out,print("PLAYER: " );
+      System.out.print("PLAYER: " );
 
       String firstName = split[5].split("=")[1];
       System.out.print(firstName + " ");
