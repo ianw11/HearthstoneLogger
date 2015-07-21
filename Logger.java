@@ -53,7 +53,7 @@ public class Logger {
       switch (os) {
       case WIN:
          
-         file = new File("\\AppData\\Local\\Blizzard\\Hearthstone\\log.config");
+         file = new File(homeDir + "\\AppData\\Local\\Blizzard\\Hearthstone\\log.config");
          original = new File(current + "\\log.config");
          break;
          
