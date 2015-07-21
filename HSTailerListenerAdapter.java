@@ -22,7 +22,8 @@ public class HSTailerListenerAdapter extends TailerListenerAdapter {
    private final Pattern ATTACKER_pattern = Pattern.compile("^\\[Power.*TAG_CHANGE.*name=.*tag=ATTACKING.*value=0.*");
    private final Pattern DEFENDER_pattern = Pattern.compile("^\\[Power.*TAG_CHANGE.*name=.*tag=DEFENDING.*value=0.*");
    
-   private final Pattern ENTERED_pattern = Pattern.compile("^\\[Zone.*\\[name=.*zone from  -> FRIENDLY PLAY.*");
+   private final Pattern ENTERED_pattern = Pattern.compile("^\\[Zone.*\\[name=.*zone from  -> (FRIENDLY|OPPOSING) PLAY.*");
+   
    private final Pattern SECRET_TRIGGER_pattern = Pattern.compile("^\\[Power.*ACTION_START.*zone=SECRET.*SubType=TRIGGER.*");
    
 
