@@ -31,6 +31,11 @@ public class Logger {
          return;
       }
       
+      // If a file was passed in, use that instead
+      if (args.length > 0) {
+         file = new File(args[0]);
+      }
+      
       try {
       
          verifyLogFileExists(homeDir, os);

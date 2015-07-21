@@ -9,7 +9,6 @@ public class HSTailerListenerAdapter extends TailerListenerAdapter {
 
    private final Pattern PLAY_pattern = Pattern.compile("^\\[Zone.*\\[name=.*zone=(PLAY|HAND).* HAND .*");
    private final Pattern START_pattern = Pattern.compile("^\\[Z.*\\[name=.*zone=PLAY.*Hero.*");
-//   private final Pattern END_pattern = Pattern.compile("^\\[Zone.*\\[name=.*zone=GRAVEYARD.*cardId=HERO.*");
    private final Pattern END_pattern = Pattern.compile("^\\[Power.*TAG_CHANGE.*tag=PLAYSTATE.*value=LOST.*");
    private final Pattern DRAW_pattern = Pattern.compile("^\\[Zone.*\\[name=.*zone=HAND.*FRIENDLY DECK.*FRIENDLY HAND");
    private final Pattern INITIAL_DRAW_pattern = Pattern.compile("^\\[Zone.*\\[name=.*zone=HAND.*from  -.*");
@@ -93,6 +92,8 @@ public class HSTailerListenerAdapter extends TailerListenerAdapter {
    public void secretTriggered(String line) {
       //[Power] GameState.DebugPrintPower() -     ACTION_START Entity=[name=Mirror Entity id=6 zone=SECRET zonePos=0 cardId=EX1_294 player=1] SubType=TRIGGER Index=0 Target=0
       
+      try {
+      
       String[] split = line.split(" ");
       
       int i = 2;
@@ -122,6 +123,12 @@ public class HSTailerListenerAdapter extends TailerListenerAdapter {
       
       
       System.out.println("SECRET: " + playerName + "'s secret (" + cardName + ") has triggered");
+      
+      } catch (Exception e) {
+         System.err.println("ERROR IN SECRETTRIGGERED");
+         e.printStackTrace();
+         System.exit(0);
+      }
       
       
    }
@@ -358,11 +365,11 @@ public class HSTailerListenerAdapter extends TailerListenerAdapter {
 
    public void startGame(String line) {
 
-      String[] split = line.split(" ");
+      //String[] split = line.split(" ");
 
-      if (!(split[9].split("=")[1].startsWith("HERO") || split[10].split("=")[1].startsWith("HERO"))) {
-         return;
-      }
+      //if (!(split[9].split("=")[1].startsWith("HERO") || split[10].split("=")[1].startsWith("HERO"))) {
+      //   return;
+      //}
 
       p1 = null;
       p2 = null;
